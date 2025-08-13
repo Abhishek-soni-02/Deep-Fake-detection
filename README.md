@@ -70,7 +70,7 @@ Prediction: Aggregated predictions determine if the video is real or deepfake.
 ## 👨‍💻 Author
 Abhishek Soni
 B.Tech (AI & ML), Manipal University Jaipur
-📧 Email: your.email@example.com
-🔗 LinkedIn | GitHub
+📧 Email: abhisheksoni0074@gmail.com
+🔗 LinkedIn- https://www.linkedin.com/in/abhisheksoni0074/
 
 
