@@ -1,0 +1,320 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepGuard | Video Authentication</title>
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">-->
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #f9fafb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 4rem);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .tagline {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .upload-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 500px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-button {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-button:hover {
+            border-color: var(--primary-light);
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+        
+        .file-input-button svg {
+            width: 48px;
+            height: 48px;
+            color: var(--primary);
+        }
+        
+        .file-input-button .file-text {
+            color: var(--text-light);
+        }
+        
+        .file-input-button .file-name {
+            font-weight: 500;
+            color: var(--primary);
+            display: none;
+        }
+        
+        #videoInput {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submit-btn:disabled {
+            background-color: var(--border);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result {
+            margin-top: 2rem;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result h2 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .result p {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .result .real {
+            color: var(--success);
+        }
+        
+        .result .fake {
+            color: var(--danger);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2.25rem;
+            }
+            
+            .upload-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="currentColor"/>
+                    <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12C18 8.69 15.31 6 12 6ZM12 16C9.79 16 8 14.21 8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12C16 14.21 14.21 16 12 16Z" fill="currentColor"/>
+                    <path d="M12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10Z" fill="currentColor"/>
+                </svg>
+                DeepGuard
+            </div>
+            <p class="tagline">Upload a video to detect AI-generated deepfake content</p>
+        </header>
+        
+        <form action="/predict" method="POST" enctype="multipart/form-data" class="upload-card upload-form">
+            <div class="form-group">
+                <label for="video">Select Video File</label>
+                <div class="file-input-wrapper">
+                    <div class="file-input-button" id="fileInputButton">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="currentColor"/>
+                        </svg>
+                        <span class="file-text hint-text">Click to upload or drag and drop</span>
+                        <span class="file-name" id="fileName"></span>
+                        <span class="file-text note-text">MP4 files only</span>
+                    </div>
+                    <input type="file" id="videoInput" name="video" accept=".mp4" required>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">Analyze Video</button>
+        </form>
+
+        {% if prediction %}
+            <div class="result">
+                <h2>Analysis Result</h2>
+                <p class="{{ 'real' if prediction == 'Real' else 'fake' }}"><strong>{{ prediction }}</strong></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('videoInput');
+            const fileInputButton = document.getElementById('fileInputButton');
+            const fileName = document.getElementById('fileName');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length) {
+                    const file = e.target.files[0];
+                    fileName.textContent = file.name;
+                    fileName.style.display = 'block';
+                    document.querySelector('.hint-text').style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // Handle drag and drop
+            fileInputButton.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileInputButton.style.borderColor = var(--primary-light);
+                fileInputButton.style.backgroundColor = 'rgba(99, 102, 241, 0.05)';
+            });
+            
+            fileInputButton.addEventListener('dragleave', () => {
+                fileInputButton.style.borderColor = var(--border);
+                fileInputButton.style.backgroundColor = 'white';
+            });
+            
+            fileInputButton.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileInputButton.style.borderColor = var(--border);
+                fileInputButton.style.backgroundColor = 'white';
+                
+                if (e.dataTransfer.files.length && e.dataTransfer.files[0].name.endsWith('.mp4')) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileName.textContent = e.dataTransfer.files[0].name;
+                    fileName.style.display = 'block';
+                    fileInputButton.querySelector('.file-text').style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
